@@ -1,4 +1,4 @@
-package com.example.chatify;
+package com.example.chatify.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,11 +17,16 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
-import com.mukeshsolanki.OnOtpCompletionListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class OTPActivity extends AppCompatActivity {
@@ -43,12 +48,11 @@ public class OTPActivity extends AppCompatActivity {
         dialog.setCancelable(true);
         dialog.show();
 
+        Objects.requireNonNull(getSupportActionBar()).hide();
+
         auth = FirebaseAuth.getInstance();
 
         String phoneNumber = "+977" + getIntent().getStringExtra("phoneNumber");
-
-        Log.d("MUJIII", "onCreate: "+ phoneNumber);
-
 
         PhoneAuthOptions options = PhoneAuthOptions.newBuilder(auth)
                 .setPhoneNumber(phoneNumber)
@@ -82,14 +86,41 @@ public class OTPActivity extends AppCompatActivity {
         binding.otpView.setOtpCompletionListener(otp -> {
             PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, otp);
 
-            auth.signInWithCredential(credential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    if(task.isSuccessful()) {
-                        Toast.makeText(OTPActivity.this, "Success.", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(OTPActivity.this, "Failed.", Toast.LENGTH_SHORT).show();
-                    }
+            auth.signInWithCredential(credential).addOnCompleteListener(task -> {
+                if(task.isSuccessful()) {
+                    FirebaseDatabase database = FirebaseDatabase.getInstance();
+                    database.getReference()
+                            .child("users")
+                            .child(auth.getUid())
+                            .addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                                    if (snapshot.exists()) {
+                                        String name = snapshot.child("name").getValue(String.class);
+
+                                        if(name != null && name.length() > 0){
+                                            Intent intent = new Intent(OTPActivity.this,MainActivity.class);
+                                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                            startActivity(intent);
+                                            return;
+
+                                        }
+                                    }
+                                        Intent intent = new Intent(OTPActivity.this,SetupProfileActivity.class);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        startActivity(intent);
+                                        finish();
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            });
+
+                } else {
+                    Toast.makeText(OTPActivity.this, "Failed.", Toast.LENGTH_SHORT).show();
                 }
             });
         });

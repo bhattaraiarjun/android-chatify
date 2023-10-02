@@ -5,14 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F9F9F9"
-    tools:context=".activities.PhoneNumberActivity">
+    tools:context=".activities.SetupProfileActivity">
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/imageView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
         android:layout_marginTop="110dp"
-        android:src="@drawable/otp_verify2"
+        android:src="@drawable/avatar"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -24,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
-        android:text="Verify your Phone Number"
+        android:text="Profile Information"
         android:textColor="#000000"
         android:textSize="18sp"
         android:textStyle="bold"
@@ -37,22 +37,23 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="Enter OTP code to verify your Phone Number"
-        android:textColor="#858383"
+        android:text="Set an optional profile Image"
+        android:textColor="#5C5B5B"
         android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="@+id/textView"
         app:layout_constraintStart_toStartOf="@+id/textView"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        app:cardBackgroundColor="@color/white"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
-        app:cardCornerRadius="10dp"
+        app:cardBackgroundColor="@color/white"
 
+        app:cardCornerRadius="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2">
@@ -63,32 +64,27 @@
             android:layout_margin="10dp"
             android:orientation="vertical">
 
-            <com.mukeshsolanki.OtpView
-                android:id="@+id/otp_view"
-                android:layout_width="wrap_content"
+            <EditText
+                android:id="@+id/nameBox"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="5dp"
-                android:focusableInTouchMode="true"
-                android:inputType="number"
-                android:itemBackground="#EFF4F2"
-                android:textColor="#090909"
-                android:textColorHighlight="#0E0E0E"
-                android:textColorLink="#070707"
-                app:OtpCursorColor="#090909"
-                app:OtpItemCount="6"
-                app:OtpLineColor="@color/green"
-                app:OtpViewType="line" />
+                android:background="@drawable/textbox_outline"
+                android:ems="10"
+                android:hint="Your Name"
+                android:inputType="text|textPersonName"
+                android:padding="13dp"
+                android:textColor="#000000" />
 
             <Button
-                android:id="@+id/profileBtn"
+                android:id="@+id/setupBtn"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
                 android:layout_marginTop="20sp"
                 android:backgroundTint="#02786D"
-                android:text="Continue"
+                android:text="Setup Profile"
                 android:textColor="@color/white"
                 android:textSize="17sp" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

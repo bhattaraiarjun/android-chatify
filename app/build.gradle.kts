@@ -48,6 +48,11 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.2.2"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-storage")
+    implementation("com.google.firebase:firebase-database")
+    implementation ("com.github.bumptech.glide:glide:4.15.1")
+    implementation ("de.hdodenhof:circleimageview:3.1.0")
+
 
 
 }

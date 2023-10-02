@@ -1,13 +1,14 @@
-package com.example.chatify;
+package com.example.chatify.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 
 import com.example.chatify.databinding.ActivityPhoneNumberBinding;
 import com.google.firebase.auth.FirebaseAuth;
+
+import java.util.Objects;
 //import com.mianasad.chatsapp.databinding.ActivityPhoneNumberBinding;
 
 public class PhoneNumberActivity extends AppCompatActivity {
@@ -28,18 +29,16 @@ public class PhoneNumberActivity extends AppCompatActivity {
             Intent intent = new Intent(PhoneNumberActivity.this, MainActivity.class);
             startActivity(intent);
             finish();
-            auth.signOut();
+           // auth.signOut();
         }
 
+        Objects.requireNonNull(getSupportActionBar()).hide();
         binding.phoneBox.requestFocus();
 
-        binding.continueBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(PhoneNumberActivity.this, OTPActivity.class);
-                intent.putExtra("phoneNumber", binding.phoneBox.getText().toString());
-                startActivity(intent);
-            }
+        binding.continueBtn.setOnClickListener(v -> {
+            Intent intent = new Intent(PhoneNumberActivity.this, OTPActivity.class);
+            intent.putExtra("phoneNumber", binding.phoneBox.getText().toString());
+            startActivity(intent);
         });
 
     }
