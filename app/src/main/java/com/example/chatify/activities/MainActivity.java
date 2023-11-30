@@ -3,6 +3,7 @@ package com.example.chatify.activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -27,11 +28,13 @@ public class MainActivity extends AppCompatActivity {
     FirebaseDatabase database;
     ArrayList<UserProfile> userProfiles;
     UsersAdapter usersAdapter;
+    ArrayList<String> offensiveWords;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
+        offensiveWords = new ArrayList<>();
 
         setContentView(R.layout.activity_main);
         setContentView(binding.getRoot());
@@ -39,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
         userProfiles = new ArrayList<>();
-        usersAdapter = new UsersAdapter(this,userProfiles);
+        usersAdapter = new UsersAdapter(this, userProfiles, this.offensiveWords);
 
         binding.recyclerView.setAdapter(usersAdapter);
 
@@ -48,9 +51,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 userProfiles.clear();
-                for (DataSnapshot snapshot1: snapshot.getChildren()){
+                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     UserProfile userProfile = snapshot1.getValue(UserProfile.class);
-                    userProfiles.add(userProfile);
+                    if (!userProfile.getUid().equals(FirebaseAuth.getInstance().getUid())) {
+                        userProfiles.add(userProfile);
+                    }
                 }
                 usersAdapter.notifyDataSetChanged();
             }
@@ -61,13 +66,31 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        database.getReference().child("offensive-words")
+                .addValueEventListener(new ValueEventListener() {
+                    @SuppressLint("NotifyDataSetChanged")
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        offensiveWords.clear();
+                        for(DataSnapshot snapshot1: snapshot.getChildren()){
+                            String word = snapshot1.getValue(String.class);
+                            offensiveWords.add(word);
+                        }
 
+                        usersAdapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.topmenu,menu);
+        getMenuInflater().inflate(R.menu.topmenu, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -82,10 +105,10 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
 
-        if(item.getItemId()== R.id.search){
+        if (item.getItemId() == R.id.search) {
             Toast.makeText(this, "Search Clicked!", Toast.LENGTH_SHORT).show();
         }
-        if(item.getItemId()== R.id.setting){
+        if (item.getItemId() == R.id.setting) {
             Toast.makeText(this, "Setting Clicked!", Toast.LENGTH_SHORT).show();
         }
         return super.onOptionsItemSelected(item);

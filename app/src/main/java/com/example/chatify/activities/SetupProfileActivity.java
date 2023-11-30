@@ -23,6 +23,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
@@ -44,7 +45,7 @@ public class SetupProfileActivity extends AppCompatActivity {
 
         dialog = new ProgressDialog(this);
         dialog.setMessage("Updating profile...");
-        dialog.setCancelable(false);
+        dialog.setCancelable(true);
 
         database = FirebaseDatabase.getInstance();
         storage = FirebaseStorage.getInstance();
@@ -66,6 +67,7 @@ public class SetupProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String name = binding.nameBox.getText().toString();
+                ArrayList<String> friends = new ArrayList<>();
 
                 if(name.isEmpty()) {
                     binding.nameBox.setError("Please type a name");
@@ -88,7 +90,7 @@ public class SetupProfileActivity extends AppCompatActivity {
                                         String phone = auth.getCurrentUser().getPhoneNumber();
                                         String name = binding.nameBox.getText().toString();
 
-                                        UserProfile user = new UserProfile(uid, name, phone, imageUrl);
+                                        UserProfile user = new UserProfile(uid, name, phone, imageUrl, friends);
 
                                         database.getReference()
                                                 .child("users")
@@ -112,7 +114,7 @@ public class SetupProfileActivity extends AppCompatActivity {
                     String uid = auth.getUid();
                     String phone = auth.getCurrentUser().getPhoneNumber();
 
-                    UserProfile user = new UserProfile(uid, name, phone, "No Image");
+                    UserProfile user = new UserProfile(uid, name, phone, "No Image", friends);
 
                     database.getReference()
                             .child("users")

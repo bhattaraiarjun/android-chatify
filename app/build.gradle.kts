@@ -52,6 +52,8 @@ dependencies {
     implementation("com.google.firebase:firebase-database")
     implementation ("com.github.bumptech.glide:glide:4.15.1")
     implementation ("de.hdodenhof:circleimageview:3.1.0")
+    implementation ("com.github.pgreze:android-reactions:1.3")
+
 
 
 
