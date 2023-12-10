@@ -128,7 +128,11 @@ public class MessagesAdapter extends RecyclerView.Adapter {
                         .placeholder(R.drawable.placeholder)
                         .into(viewHolder.binding.image);
             }
-            viewHolder.binding.message.setText(ChatifyUtils.censorOffensiveWords(message.getMessage(), offensiveWords));
+            try {
+                viewHolder.binding.message.setText(ChatifyUtils.censorOffensiveWords(ChatifyUtils.decryptMessage(message.getMessage()), offensiveWords));
+            } catch (Exception e) {
+                viewHolder.binding.message.setText(ChatifyUtils.censorOffensiveWords(message.getMessage(), offensiveWords));
+            }
 
             if(message.getFeeling()>=0){
                 viewHolder.binding.feeling.setImageResource(reactions[message.getFeeling()]);
@@ -150,6 +154,7 @@ public class MessagesAdapter extends RecyclerView.Adapter {
         } else {
             ReceiverViewHolder viewHolder = (ReceiverViewHolder) holder;
             if(message.getMessage().equals("photo")){
+
                 viewHolder.binding.image.setVisibility(View.VISIBLE);
                 viewHolder.binding.message.setVisibility(View.GONE);
                 Glide.with(context)
@@ -157,7 +162,11 @@ public class MessagesAdapter extends RecyclerView.Adapter {
                         .placeholder(R.drawable.placeholder)
                         .into(viewHolder.binding.image);
             }
-            viewHolder.binding.message.setText(ChatifyUtils.censorOffensiveWords(message.getMessage(), offensiveWords));
+            try {
+                viewHolder.binding.message.setText(ChatifyUtils.censorOffensiveWords(ChatifyUtils.decryptMessage(message.getMessage()), offensiveWords));
+            } catch (Exception e) {
+                viewHolder.binding.message.setText(ChatifyUtils.censorOffensiveWords(message.getMessage(), offensiveWords));
+            }
 
             if(message.getFeeling() >= 0){
                 //message.setFeeling(reactions[(int) message.getFeeling()]);
@@ -210,10 +219,10 @@ public class MessagesAdapter extends RecyclerView.Adapter {
 
     public class ReceiverViewHolder extends RecyclerView.ViewHolder {
         ItemReceiveBinding binding;
-
         public ReceiverViewHolder(@NonNull View itemView) {
             super(itemView);
             binding = ItemReceiveBinding.bind(itemView);
+
         }
     }
 }

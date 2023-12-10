@@ -14,13 +14,16 @@ import com.example.chatify.R;
 import com.example.chatify.adapters.UsersAdapter;
 import com.example.chatify.databinding.ActivityMainBinding;
 import com.example.chatify.models.UserProfile;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
     ActivityMainBinding binding;
@@ -41,6 +44,21 @@ public class MainActivity extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
+        FirebaseMessaging.getInstance()
+                .getToken()
+                .addOnSuccessListener(new OnSuccessListener<String>() {
+                    @Override
+                    public void onSuccess(String token) {
+                        HashMap<String, Object> map = new HashMap<>();
+                        map.put("token", token);
+                        database.getReference()
+                                .child("users")
+                                .child(FirebaseAuth.getInstance().getUid())
+                                .updateChildren(map);
+                        //Toast.makeText(MainActivity.this, token, Toast.LENGTH_SHORT).show();
+                    }
+                });
+
         userProfiles = new ArrayList<>();
         usersAdapter = new UsersAdapter(this, userProfiles, this.offensiveWords);
 
@@ -53,12 +71,14 @@ public class MainActivity extends AppCompatActivity {
                 userProfiles.clear();
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     UserProfile userProfile = snapshot1.getValue(UserProfile.class);
-                    if (!userProfile.getUid().equals(FirebaseAuth.getInstance().getUid())) {
+                    if (userProfile != null && userProfile.getUid() != null
+                            && !userProfile.getUid().equals(FirebaseAuth.getInstance().getUid())) {
                         userProfiles.add(userProfile);
                     }
                 }
                 usersAdapter.notifyDataSetChanged();
             }
+
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -113,6 +133,4 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-
 }

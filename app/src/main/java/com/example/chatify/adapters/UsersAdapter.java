@@ -60,7 +60,11 @@ public class UsersAdapter extends  RecyclerView.Adapter<UsersAdapter.UsersViewHo
                                                     SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm a");
                                                     holder.binding.msgTime.setVisibility(View.VISIBLE);
                                                     holder.binding.msgTime.setText(dateFormat.format(new Date(time)));
-                                                    holder.binding.lastMsg.setText(ChatifyUtils.censorOffensiveWords(lastMsg, offensiveWords));
+                                                    try {
+                                                        holder.binding.lastMsg.setText(ChatifyUtils.censorOffensiveWords(ChatifyUtils.decryptMessage(lastMsg), offensiveWords));
+                                                    } catch (Exception e) {
+                                                        holder.binding.lastMsg.setText(ChatifyUtils.censorOffensiveWords(lastMsg, offensiveWords));
+                                                    }
                                                 } else {
                                                     holder.binding.lastMsg.setText("Tap to chat");
                                                     holder.binding.msgTime.setVisibility(View.INVISIBLE);
@@ -86,6 +90,7 @@ public class UsersAdapter extends  RecyclerView.Adapter<UsersAdapter.UsersViewHo
                 intent.putExtra("uid",userProfile.getUid());
                 intent.putExtra("friends", userProfile.getFriends());
                 intent.putExtra("offensive-words", offensiveWords);
+                intent.putExtra("token", userProfile.getToken());
 
                 context.startActivity(intent);
             }

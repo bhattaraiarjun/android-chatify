@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginStart="20dp"
     android:layout_marginTop="8dp">
 
     <LinearLayout
@@ -30,11 +31,11 @@
             android:id="@+id/message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="15dp"
+            android:paddingLeft="24dp"
             android:paddingTop="5dp"
             android:paddingRight="10dp"
             android:paddingBottom="5dp"
-            android:text="TextView"
+            android:text="TextViewTextViewTextViewTextViewText"
             android:textColor="#040404"
             android:textSize="16sp" />
     </LinearLayout>

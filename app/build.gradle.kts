@@ -12,7 +12,7 @@ buildFeatures {
 
     defaultConfig {
         applicationId = "com.example.chatify"
-        minSdk = 21
+        minSdk = 26
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"
@@ -49,10 +49,12 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-storage")
+    implementation("com.google.firebase:firebase-messaging")
     implementation("com.google.firebase:firebase-database")
     implementation ("com.github.bumptech.glide:glide:4.15.1")
     implementation ("de.hdodenhof:circleimageview:3.1.0")
     implementation ("com.github.pgreze:android-reactions:1.3")
+    implementation ("com.android.volley:volley:1.2.0")
 
 
 

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class UserProfile {
 
-    private String uid, name,phoneNumber, profileImage;
+    private String uid, name,phoneNumber, profileImage, token;
     private ArrayList<String> friends;
     public UserProfile(){
 
@@ -59,5 +59,13 @@ public class UserProfile {
 
     public void setFriends(ArrayList<String> friends) {
         this.friends = friends;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }
