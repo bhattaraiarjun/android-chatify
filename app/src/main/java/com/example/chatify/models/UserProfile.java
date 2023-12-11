@@ -1,5 +1,7 @@
 package com.example.chatify.models;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 
 public class UserProfile {
@@ -67,5 +69,14 @@ public class UserProfile {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return  this.uid + "\n" +
+                this.name + "\n" +
+                this.profileImage +
+                "\n";
     }
 }

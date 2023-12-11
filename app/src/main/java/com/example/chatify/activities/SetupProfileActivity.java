@@ -1,5 +1,6 @@
 package com.example.chatify.activities;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
@@ -11,6 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
+import com.example.chatify.R;
 import com.example.chatify.databinding.ActivitySetupProfileBinding;
 import com.example.chatify.models.UserProfile;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -18,7 +21,9 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -36,6 +41,7 @@ public class SetupProfileActivity extends AppCompatActivity {
     FirebaseStorage storage;
     Uri selectedImage;
     ProgressDialog dialog;
+    UserProfile userProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +56,27 @@ public class SetupProfileActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance();
         storage = FirebaseStorage.getInstance();
         auth = FirebaseAuth.getInstance();
+
+        database.getReference().child("users").child(auth.getUid()).addValueEventListener(new ValueEventListener() {
+            @SuppressLint("NotifyDataSetChanged")
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                userProfile = snapshot.getValue(UserProfile.class);
+                if(userProfile == null){
+                    return;
+                }
+                binding.nameBox.setText(userProfile.getName());
+                if(!Objects.equals(userProfile.getProfileImage(), "No Image")){
+                    Glide.with(SetupProfileActivity.this).load(userProfile.getProfileImage())
+                            .placeholder(R.drawable.avatar)
+                            .into(binding.imageView2);
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
         Objects.requireNonNull(getSupportActionBar()).hide();
 
@@ -77,37 +104,28 @@ public class SetupProfileActivity extends AppCompatActivity {
                 dialog.show();
                 if(selectedImage != null) {
                     StorageReference reference = storage.getReference().child("Profiles").child(auth.getUid());
-                    reference.putFile(selectedImage).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                            if(task.isSuccessful()) {
-                                reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                    @Override
-                                    public void onSuccess(Uri uri) {
-                                        String imageUrl = uri.toString();
+                    reference.putFile(selectedImage).addOnCompleteListener(task -> {
+                        if(task.isSuccessful()) {
+                            reference.getDownloadUrl().addOnSuccessListener(uri -> {
+                                String imageUrl = uri.toString();
 
-                                        String uid = auth.getUid();
-                                        String phone = auth.getCurrentUser().getPhoneNumber();
-                                        String name = binding.nameBox.getText().toString();
+                                String uid = auth.getUid();
+                                String phone = auth.getCurrentUser().getPhoneNumber();
+                                String name1 = binding.nameBox.getText().toString();
 
-                                        UserProfile user = new UserProfile(uid, name, phone, imageUrl, friends);
+                                UserProfile user = new UserProfile(uid, name1, phone, imageUrl, friends);
 
-                                        database.getReference()
-                                                .child("users")
-                                                .child(uid)
-                                                .setValue(user)
-                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        dialog.dismiss();
-                                                        Intent intent = new Intent(SetupProfileActivity.this, MainActivity.class);
-                                                        startActivity(intent);
-                                                        finish();
-                                                    }
-                                                });
-                                    }
-                                });
-                            }
+                                database.getReference()
+                                        .child("users")
+                                        .child(uid)
+                                        .setValue(user)
+                                        .addOnSuccessListener(aVoid -> {
+                                            dialog.dismiss();
+                                            Intent intent = new Intent(SetupProfileActivity.this, MainActivity.class);
+                                            startActivity(intent);
+                                            finish();
+                                        });
+                            });
                         }
                     });
                 } else {
@@ -115,6 +133,9 @@ public class SetupProfileActivity extends AppCompatActivity {
                     String phone = auth.getCurrentUser().getPhoneNumber();
 
                     UserProfile user = new UserProfile(uid, name, phone, "No Image", friends);
+                    if(userProfile != null){
+                        user.setProfileImage(userProfile.getProfileImage());
+                    }
 
                     database.getReference()
                             .child("users")
@@ -140,34 +161,6 @@ public class SetupProfileActivity extends AppCompatActivity {
 
         if(data != null) {
             if(data.getData() != null) {
-                Uri uri = data.getData(); // filepath
-                FirebaseStorage storage = FirebaseStorage.getInstance();
-                long time = new Date().getTime();
-                StorageReference reference = storage.getReference().child("Profiles").child(time+"");
-                reference.putFile(uri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                        if(task.isSuccessful()) {
-                            reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                @Override
-                                public void onSuccess(Uri uri) {
-                                    String filePath = uri.toString();
-                                    HashMap<String, Object> obj = new HashMap<>();
-                                    obj.put("image", filePath);
-                                    database.getReference().child("users")
-                                            .child(FirebaseAuth.getInstance().getUid())
-                                            .updateChildren(obj).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-
-                                                }
-                                            });
-                                }
-                            });
-                        }
-                    }
-                });
-
                 binding.imageView2.setImageURI(data.getData());
                 selectedImage = data.getData();
             }

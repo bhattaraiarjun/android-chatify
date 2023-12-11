@@ -125,8 +125,10 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
 
-        if (item.getItemId() == R.id.search) {
-            Toast.makeText(this, "Search Clicked!", Toast.LENGTH_SHORT).show();
+        if (item.getItemId() == R.id.profile) {
+            Intent intent = new Intent(MainActivity.this,
+                    SetupProfileActivity.class);
+            startActivity(intent);
         }
         if (item.getItemId() == R.id.setting) {
             Toast.makeText(this, "Setting Clicked!", Toast.LENGTH_SHORT).show();
